@@ -41,14 +41,15 @@ def welcome():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/start<br/>"
-        f"/api/v1.0/start/end"
+        f"/api/v1.0/<startdate><br/>"
+        f"/api/v1.0/<startdate>/<enddate>"
     )
 
 
 @app.route("/api/v1.0/precipitation")
 def precipitation():
-    
+
+    session = Session(engine)
 #Find last date in database
     Last_Year_Observation = dt.date(2017, 8, 23) - dt.timedelta(days=7*52)
 
@@ -60,8 +61,8 @@ def precipitation():
     precipitation= []
     for result in precipitation_results:
         row = {"date":"prcp"}
-        row["date"] = result[0]
-        row["prcp"] = float(result[1])
+        row["date"] = precipitation_results[0]
+        row["prcp"] = float(precipitation_results[1])
         precipitation.append(row)
 
     return jsonify(precipitation)
@@ -69,6 +70,7 @@ def precipitation():
 @app.route("/api/v1.0/stations")
 
 def stationName():
+    session = Session(engine)
     # Query all station names
     stationName_results = session.query(Station.station).all()
 
@@ -82,6 +84,7 @@ def stationName():
 
 @app.route("/api/v1.0/tobs")
 def tobs():
+    session = Session(engine)
     #Find last date in database
     Last_Year_Observation = dt.date(2017, 8, 23) - dt.timedelta(days=7*52)
 
@@ -117,6 +120,7 @@ def start_date(startdate):
 # Same as above but this time with an end Date
 @app.route("/api/v1.0/<startdate>/<enddate>")
 def daterange(startdate,enddate):
+    session = Session(engine)
     #Parse the date 
     Start_Date = dt.datetime.strptime(startdate,"%Y-%m-%d")
     End_Date = dt.datetime.strptime(enddate,"%Y-%m-%d")
